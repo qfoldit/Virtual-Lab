@@ -64,9 +64,8 @@ def test_web_search_enabled_passes_web_search_options(tmp_path):
     """When web_search=True, web_search_options should be a WebSearchOptions instance."""
     mock_create = _run(tmp_path, web_search=True)
     kwargs = mock_create.call_args_list[0].kwargs
-    # WebSearchOptions is a TypedDict, so we check it's a dict and not NOT_GIVEN
+    # WebSearchOptions() is an empty dict (TypedDict doesn't support isinstance checks)
     assert kwargs.get("web_search_options") == {}
-    assert kwargs.get("web_search_options") is not NOT_GIVEN
 
 
 def test_web_search_does_not_affect_tools_list(tmp_path):
