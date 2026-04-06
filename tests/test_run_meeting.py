@@ -65,7 +65,7 @@ def test_web_search_enabled_passes_web_search_options(tmp_path):
     mock_create = _run(tmp_path, web_search=True)
     kwargs = mock_create.call_args_list[0].kwargs
     # WebSearchOptions is a TypedDict, so we check it's a dict and not NOT_GIVEN
-    assert isinstance(kwargs.get("web_search_options"), dict)
+    assert kwargs.get("web_search_options") == {}
     assert kwargs.get("web_search_options") is not NOT_GIVEN
 
 
@@ -83,7 +83,7 @@ def test_pubmed_and_web_search_can_be_combined(tmp_path):
     # tools list should contain PubMed tool
     assert kwargs.get("tools") is not NOT_GIVEN
     # web_search_options should be set (as a dict, not NOT_GIVEN)
-    assert isinstance(kwargs.get("web_search_options"), dict)
+    assert kwargs.get("web_search_options") == {}
     assert kwargs.get("web_search_options") is not NOT_GIVEN
 
 
@@ -107,7 +107,7 @@ def test_web_search_options_propagates_to_followup_create_call(tmp_path):
     second_response.choices[0].message.content = "done"
     second_response.choices[0].message.tool_calls = None
 
-    mock_create = MagicMock(side_effect=[first_response, second_response, second_response])
+    mock_create = MagicMock(side_effect=[first_response, second_response])
 
     with patch("virtual_lab.run_meeting.OpenAI") as MockOpenAI, \
          patch("virtual_lab.run_meeting.save_meeting"), \
@@ -130,8 +130,8 @@ def test_web_search_options_propagates_to_followup_create_call(tmp_path):
         )
 
     # The second create() call (tool followup) should also carry web_search_options
-    assert mock_create.call_count >= 2
+    assert mock_create.call_count == 2
     second_call_kwargs = mock_create.call_args_list[1].kwargs
     # WebSearchOptions is a TypedDict, so we check it's a dict and not NOT_GIVEN
-    assert isinstance(second_call_kwargs.get("web_search_options"), dict)
+    assert second_call_kwargs.get("web_search_options") == {}
     assert second_call_kwargs.get("web_search_options") is not NOT_GIVEN
