@@ -164,5 +164,8 @@ cython_debug/
 # Mac
 .DS_Store
 
+# Git worktrees
+.worktrees/
+
 # Papers
 nanobody_design/discussions/finetuning/papers
