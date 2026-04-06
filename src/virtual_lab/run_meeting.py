@@ -6,6 +6,7 @@ from typing import Literal
 
 from openai import OpenAI, NOT_GIVEN
 from openai.types.chat import ChatCompletionAssistantMessageParam, ChatCompletionMessageParam, ChatCompletionToolParam
+from openai.types.chat.completion_create_params import WebSearchOptions
 from tqdm import trange, tqdm
 
 from virtual_lab.agent import Agent
@@ -46,6 +47,7 @@ def run_meeting(
     num_rounds: int = 0,
     temperature: float = CONSISTENT_TEMPERATURE,
     pubmed_search: bool = False,
+    web_search: bool = False,
     return_summary: bool = False,
 ) -> str | None:
     """Runs a meeting with a LLM agents.
@@ -64,6 +66,7 @@ def run_meeting(
     :param num_rounds: The number of rounds of discussion.
     :param temperature: The sampling temperature.
     :param pubmed_search: Whether to include a PubMed search tool.
+    :param web_search: Whether to enable the OpenAI web search tool, allowing agents to search the web during the meeting.
     :param return_summary: Whether to return the summary of the meeting.
     :return: The summary of the meeting (i.e., the last message) if return_summary is True, else None.
     """
@@ -105,6 +108,11 @@ def run_meeting(
     tools: list[ChatCompletionToolParam] | None = (
         [ChatCompletionToolParam(**PUBMED_TOOL_DESCRIPTION)] if pubmed_search else None  # type: ignore[misc]
     )
+
+    # Set up web search options
+    # NOTE: Use `is not None` guard (not truthiness) when passing to create() —
+    # WebSearchOptions() is an empty dict, which is falsy in Python.
+    web_search_opts: WebSearchOptions | None = WebSearchOptions() if web_search else None
 
     # Set up tool token count
     tool_token_count = 0
@@ -192,6 +200,7 @@ def run_meeting(
                 messages=agent_messages,
                 temperature=temperature,
                 tools=tools if tools else NOT_GIVEN,
+                web_search_options=web_search_opts if web_search_opts is not None else NOT_GIVEN,
             )
 
             # Get the response message
@@ -228,6 +237,7 @@ def run_meeting(
                     model=agent.model,
                     messages=agent_messages,
                     temperature=temperature,
+                    web_search_options=web_search_opts if web_search_opts is not None else NOT_GIVEN,
                 )
                 response_message = response.choices[0].message
 
