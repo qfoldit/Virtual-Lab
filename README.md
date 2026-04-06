@@ -52,3 +52,14 @@ pip install -e .
 ## OpenAI API Key
 
 The Virtual Lab currently uses GPT-5.2 from OpenAI by default. Save your OpenAI API key as the environment variable `OPENAI_API_KEY`. For example, add `export OPENAI_API_KEY=<your_key>` to your `.bashrc` or `.bash_profile`.
+
+
+## Usage
+
+### Meeting Parameters
+
+When running meetings with `run_meeting()`, you can enable optional tools and search capabilities:
+
+**PubMed Search:** Pass `pubmed_search=True` to `run_meeting()` to enable PubMed literature search. The model will use the PubMed search tool to query scientific literature during the meeting.
+
+**Web Search:** Pass `web_search=True` to `run_meeting()` to enable real-time web search via OpenAI's built-in web search tool. The model will automatically search the web as needed during the meeting. Requires a model that supports `web_search_options` (e.g. `gpt-4o`, `gpt-5`).
